@@ -4,7 +4,7 @@ import { Target, LogOut, TrendingUp, Award, Clock } from "lucide-react";
 import googleLogo from "@/assets/google-logo.png";
 
 const companies = [
-  { id: 1, name: "Google", role: "Software Engineer", logo: googleLogo, color: "from-blue-500 to-blue-600", isImage: true },
+  { id: 1, name: "Google", role: "Software Engineer", logo: googleLogo, color: "bg-white", isImage: true },
   { id: 2, name: "Microsoft", role: "Full Stack Developer", logo: "Ⓜ️", color: "from-green-500 to-green-600" },
   { id: 3, name: "Amazon", role: "Cloud Engineer", logo: "📦", color: "from-orange-500 to-orange-600" },
   { id: 4, name: "Apple", role: "iOS Developer", logo: "🍎", color: "from-gray-700 to-gray-800" },
@@ -97,7 +97,7 @@ const Dashboard = () => {
                 key={company.id}
                 className="group p-6 rounded-2xl bg-card border-2 border-border hover:border-primary/50 hover:shadow-lg transition-all duration-300"
               >
-                <div className={`h-16 w-16 rounded-2xl bg-gradient-to-br ${company.color} flex items-center justify-center text-3xl mb-4 group-hover:scale-110 transition-transform`}>
+                <div className={`h-16 w-16 rounded-2xl ${company.isImage ? company.color : `bg-gradient-to-br ${company.color}`} flex items-center justify-center text-3xl mb-4 group-hover:scale-110 transition-transform`}>
                   {company.isImage ? (
                     <img src={company.logo} alt={`${company.name} logo`} className="w-12 h-12 object-contain" />
                   ) : (
