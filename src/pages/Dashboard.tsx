@@ -2,23 +2,70 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Target, LogOut, TrendingUp, Award, Clock } from "lucide-react";
 import googleLogo from "@/assets/google-logo.png";
-
-const companies = [
-  { id: 1, name: "Google", role: "Software Engineer", logo: googleLogo, color: "bg-white", isImage: true },
-  { id: 2, name: "Microsoft", role: "Full Stack Developer", logo: "Ⓜ️", color: "from-green-500 to-green-600" },
-  { id: 3, name: "Amazon", role: "Cloud Engineer", logo: "📦", color: "from-orange-500 to-orange-600" },
-  { id: 4, name: "Apple", role: "iOS Developer", logo: "🍎", color: "from-gray-700 to-gray-800" },
-  { id: 5, name: "Meta", role: "Frontend Engineer", logo: "📘", color: "from-blue-600 to-blue-700" },
-  { id: 6, name: "Netflix", role: "Backend Developer", logo: "🎬", color: "from-red-600 to-red-700" },
-  { id: 7, name: "Tesla", role: "Software Engineer", logo: "⚡", color: "from-red-500 to-red-600" },
-  { id: 8, name: "Spotify", role: "Data Engineer", logo: "🎵", color: "from-green-600 to-green-700" },
-  { id: 9, name: "Adobe", role: "UI/UX Developer", logo: "🎨", color: "from-red-600 to-pink-600" },
-  { id: 10, name: "IBM", role: "AI Engineer", logo: "💼", color: "from-blue-700 to-blue-800" },
-];
-
+const companies = [{
+  id: 1,
+  name: "Google",
+  role: "Software Engineer",
+  logo: googleLogo,
+  color: "bg-white",
+  isImage: true
+}, {
+  id: 2,
+  name: "Microsoft",
+  role: "Full Stack Developer",
+  logo: "Ⓜ️",
+  color: "from-green-500 to-green-600"
+}, {
+  id: 3,
+  name: "Amazon",
+  role: "Cloud Engineer",
+  logo: "📦",
+  color: "from-orange-500 to-orange-600"
+}, {
+  id: 4,
+  name: "Apple",
+  role: "iOS Developer",
+  logo: "🍎",
+  color: "from-gray-700 to-gray-800"
+}, {
+  id: 5,
+  name: "Meta",
+  role: "Frontend Engineer",
+  logo: "📘",
+  color: "from-blue-600 to-blue-700"
+}, {
+  id: 6,
+  name: "Netflix",
+  role: "Backend Developer",
+  logo: "🎬",
+  color: "from-red-600 to-red-700"
+}, {
+  id: 7,
+  name: "Tesla",
+  role: "Software Engineer",
+  logo: "⚡",
+  color: "from-red-500 to-red-600"
+}, {
+  id: 8,
+  name: "Spotify",
+  role: "Data Engineer",
+  logo: "🎵",
+  color: "from-green-600 to-green-700"
+}, {
+  id: 9,
+  name: "Adobe",
+  role: "UI/UX Developer",
+  logo: "🎨",
+  color: "from-red-600 to-pink-600"
+}, {
+  id: 10,
+  name: "IBM",
+  role: "AI Engineer",
+  logo: "💼",
+  color: "from-blue-700 to-blue-800"
+}];
 const Dashboard = () => {
-  return (
-    <div className="min-h-screen bg-background">
+  return <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="bg-card border-b border-border sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4">
@@ -92,25 +139,16 @@ const Dashboard = () => {
         <div>
           <h2 className="text-2xl font-bold mb-6">Available Companies</h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {companies.map((company) => (
-              <div
-                key={company.id}
-                className="group p-6 rounded-2xl bg-card border-2 border-border hover:border-primary/50 hover:shadow-lg transition-all duration-300"
-              >
+            {companies.map(company => <div key={company.id} className="group p-6 rounded-2xl bg-card border-2 border-border hover:border-primary/50 hover:shadow-lg transition-all duration-300">
                 <div className={`h-16 w-16 rounded-2xl ${company.isImage ? company.color : `bg-gradient-to-br ${company.color}`} flex items-center justify-center text-3xl mb-4 group-hover:scale-110 transition-transform`}>
-                  {company.isImage ? (
-                    <img src={company.logo} alt={`${company.name} logo`} className="w-12 h-12 object-contain" />
-                  ) : (
-                    company.logo
-                  )}
+                  {company.isImage ? <img src={company.logo} alt={`${company.name} logo`} className="max-w-12 h-12 object-contain" /> : company.logo}
                 </div>
                 <h3 className="text-xl font-bold mb-1">{company.name}</h3>
                 <p className="text-sm text-muted-foreground mb-4">{company.role}</p>
                 <Button variant="outline" className="w-full">
                   Start Mock Test
                 </Button>
-              </div>
-            ))}
+              </div>)}
           </div>
         </div>
 
@@ -128,8 +166,6 @@ const Dashboard = () => {
           </div>
         </div>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default Dashboard;
