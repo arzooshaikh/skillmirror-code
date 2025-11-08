@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Target, LogOut, TrendingUp, Award, Clock } from "lucide-react";
 import googleLogo from "@/assets/google-logo.png";
+import microsoftLogo from "@/assets/microsoft-logo.png";
 const companies = [{
   id: 1,
   name: "Google",
@@ -13,8 +14,9 @@ const companies = [{
   id: 2,
   name: "Microsoft",
   role: "Full Stack Developer",
-  logo: "Ⓜ️",
-  color: "from-green-500 to-green-600"
+  logo: microsoftLogo,
+  color: "bg-white",
+  isImage: true
 }, {
   id: 3,
   name: "Amazon",
