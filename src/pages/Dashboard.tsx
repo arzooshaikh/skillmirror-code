@@ -7,6 +7,7 @@ import amazonLogo from "@/assets/amazon-logo.png";
 import appleLogo from "@/assets/apple-logo.png";
 import metaLogo from "@/assets/meta-logo.png";
 import netflixLogo from "@/assets/netflix-logo.png";
+import teslaLogo from "@/assets/tesla-logo.png";
 const companies = [{
   id: 1,
   name: "Google",
@@ -53,8 +54,9 @@ const companies = [{
   id: 7,
   name: "Tesla",
   role: "Software Engineer",
-  logo: "⚡",
-  color: "from-red-500 to-red-600"
+  logo: teslaLogo,
+  color: "bg-white",
+  isImage: true
 }, {
   id: 8,
   name: "Spotify",
