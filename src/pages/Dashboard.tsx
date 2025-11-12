@@ -10,6 +10,7 @@ import netflixLogo from "@/assets/netflix-logo.png";
 import teslaLogo from "@/assets/tesla-logo.png";
 import spotifyLogo from "@/assets/spotify-logo.png";
 import adobeLogo from "@/assets/adobe-logo.png";
+import ibmLogo from "@/assets/ibm-logo.png";
 const companies = [{
   id: 1,
   name: "Google",
@@ -77,8 +78,9 @@ const companies = [{
   id: 10,
   name: "IBM",
   role: "AI Engineer",
-  logo: "💼",
-  color: "from-blue-700 to-blue-800"
+  logo: ibmLogo,
+  color: "bg-white",
+  isImage: true
 }];
 const Dashboard = () => {
   return <div className="min-h-screen bg-background">
