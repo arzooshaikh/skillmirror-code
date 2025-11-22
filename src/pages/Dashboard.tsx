@@ -163,9 +163,11 @@ const Dashboard = () => {
                 </div>
                 <h3 className="text-xl font-bold mb-1">{company.name}</h3>
                 <p className="text-sm text-muted-foreground mb-4">{company.role}</p>
-                <Button variant="outline" className="w-full">
-                  Start Mock Test
-                </Button>
+                <Link to={`/aptitude-test/${encodeURIComponent(company.name)}`} className="w-full">
+                  <Button variant="outline" className="w-full">
+                    Start Mock Test
+                  </Button>
+                </Link>
               </div>)}
           </div>
         </div>
