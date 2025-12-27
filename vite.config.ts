@@ -4,9 +4,10 @@ import path from "path";
 import { componentTagger } from "lovable-tagger";
 
 export default defineConfig(({ mode }) => ({
+  base: "/", // ✅ VERY IMPORTANT for Vercel
   plugins: [
     react(),
-    mode === "development" && componentTagger()
+    mode === "development" && componentTagger(),
   ].filter(Boolean),
   resolve: {
     alias: {
@@ -14,4 +15,5 @@ export default defineConfig(({ mode }) => ({
     },
   },
 }));
+
 
