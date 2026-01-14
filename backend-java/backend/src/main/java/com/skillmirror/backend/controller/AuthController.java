@@ -1,7 +1,9 @@
 package com.skillmirror.backend.controller;
 import com.skillmirror.backend.entity.User;
-import com.skillmirror.backend.repository.UserRepository;
 import com.skillmirror.backend.entity.LoginRequest;
+import com.skillmirror.backend.entity.RegisterRequest;
+import com.skillmirror.backend.repository.UserRepository;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,27 +18,30 @@ public class AuthController {
         this.userRepository = userRepository;
     }
 
-    // SIGN UP
+    // REGISTER
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody User user) {
+    public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
 
-        if (user.getEmail() == null || user.getPassword() == null || user.getFullName() == null) {
-            return ResponseEntity.badRequest().body("Missing required fields");
-        }
-        if (userRepository.findByEmail(user.getEmail()).isPresent()) {
+        if (userRepository.findByEmail(request.getEmail()).isPresent()) {
             return ResponseEntity.badRequest().body("Email already exists");
         }
+
+        User user = new User();
+        user.setFullName(request.getFullName());
+        user.setEmail(request.getEmail());
+        user.setCollege(request.getCollege());
+        user.setPassword(request.getPassword()); //PLAIN PASSWORD (NO BCRYPT)
+
         userRepository.save(user);
+
         return ResponseEntity.ok("User registered successfully");
     }
-
 
     // LOGIN
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
 
-        User user = userRepository.findByEmail(request.getEmail())
-                .orElse(null);
+        User user = userRepository.findByEmail(request.getEmail()).orElse(null);
 
         if (user == null || !user.getPassword().equals(request.getPassword())) {
             return ResponseEntity.status(401).body("Invalid email or password");
