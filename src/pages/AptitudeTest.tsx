@@ -7,17 +7,17 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Target, Clock, ChevronLeft, ChevronRight, Flag, Mail, CheckCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
 import { getQuestions } from "@/data/companyQuestions";
+import emailjs from "@emailjs/browser";
+
 
 const AptitudeTest = () => {
   const { companyId } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
-  
   const companyName = companyId ? decodeURIComponent(companyId) : "Google";
   const aptitudeQuestions = getQuestions(companyName);
-  
+
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [answers, setAnswers] = useState<(number | null)[]>(new Array(aptitudeQuestions.length).fill(null));
   const [timeLeft, setTimeLeft] = useState(40 * 60); // 40 minutes in seconds
@@ -25,10 +25,13 @@ const AptitudeTest = () => {
   const [email, setEmail] = useState("");
   const [testStarted, setTestStarted] = useState(false);
   const [isSendingEmail, setIsSendingEmail] = useState(false);
+  const CUTOFF_PERCENTAGE = 80;
+  const [resultMessage, setResultMessage] = useState<string | null>(null);
+
 
   useEffect(() => {
     if (isSubmitted) return;
-    
+
     const timer = setInterval(() => {
       setTimeLeft((prev) => {
         if (prev <= 1) {
@@ -85,7 +88,7 @@ const AptitudeTest = () => {
     };
 
     const weakCategories: string[] = [];
-    
+
     Object.entries(questionCategories).forEach(([category, questionIndices]) => {
       let wrongCount = 0;
       questionIndices.forEach(index => {
@@ -93,7 +96,7 @@ const AptitudeTest = () => {
           wrongCount++;
         }
       });
-      
+
       if (wrongCount > 0) {
         weakCategories.push(`${category} (${wrongCount}/${questionIndices.length} incorrect)`);
       }
@@ -102,52 +105,99 @@ const AptitudeTest = () => {
     return weakCategories.length > 0 ? weakCategories : ["General aptitude concepts"];
   };
 
-  const handleSubmit = async () => {
-    const answeredCount = answers.filter(a => a !== null).length;
-    let correctCount = 0;
-    
-    answers.forEach((answer, index) => {
-      if (answer === aptitudeQuestions[index].correctAnswer) {
-        correctCount++;
-      }
-    });
+ const handleSubmit = async () => {
+   if (isSubmitted) return;
+   setIsSubmitted(true);
+   setIsSendingEmail(true);
 
-    const percentage = (correctCount / aptitudeQuestions.length) * 100;
+   try {
+     // 1️⃣ BACKEND EVALUATION (MUST WORK)
+     const response = await fetch("http://localhost:8080/api/aptitude/evaluate", {
+       method: "POST",
+       headers: { "Content-Type": "application/json" },
+       body: JSON.stringify({
+         answers: answers.map((ans, index) => {
+           // If the question was not answered
+           if (ans === null) {
+             return 0; // treat as wrong answer
+           }
 
-    setIsSubmitted(true);
-    setIsSendingEmail(true);
+           // If answered, check correctness
+           return ans === aptitudeQuestions[index].correctAnswer ? 1 : 0;
+         }),
+       }),
+     });
+
+     const data = await response.json();
+     const totalQuestions = aptitudeQuestions.length;
+     const correctCount = answers.reduce((count, ans, index) => {
+       return ans === aptitudeQuestions[index].correctAnswer ? count + 1 : count;
+     }, 0);
+     const percentage = (correctCount / totalQuestions) * 100;
+     // ✅ THEN CONTINUE
+     const isPassed = percentage >= CUTOFF_PERCENTAGE;
+     const weakAreas = analyzeWeakAreas();
+
+     // UI message (always show)
+     setResultMessage(
+       isPassed
+         ? "Congratulations! You have cleared the Aptitude Round and qualified for the Technical Round 🎉"
+         : "You did not clear the Aptitude Round. Focus on your weak areas and try again 💪"
+     );
 
     try {
-      const weakAreas = analyzeWeakAreas();
-      
-      const { data, error } = await supabase.functions.invoke('send-test-result', {
-        body: {
-          email,
-          companyName,
-          score: correctCount,
-          totalQuestions: aptitudeQuestions.length,
-          percentage,
-          weakAreas
-        }
-      });
+      await emailjs.send(
+        "service_kyg8j0o",          // ✅ your Service ID
+        "template_tkihh98",         // ❗ replace with your TEMPLATE ID
+        {
+          to_email: email,          // ✅ REQUIRED
+          subject: isPassed
+            ? "SkillMirror Aptitude Test – Qualified for Technical Round"
+            : "SkillMirror Aptitude Test – Performance Analysis",
 
-      if (error) throw error;
+          message: isPassed
+            ? `Congratulations! You have cleared the Aptitude Round for ${companyName}.`
+            : `Thank you for taking the Aptitude Test for ${companyName}. Here is your detailed performance analysis.`,
+
+          score: `${correctCount}/${totalQuestions}`,
+          percentage: percentage.toFixed(2),
+          status: isPassed ? "PASSED" : "FAILED",
+          weak_areas: isPassed ? "None" : weakAreas.join(", "),
+          next_round: isPassed ? "Technical Round" : "Not Qualified",
+          resources: isPassed
+            ? "You are eligible for the Technical Round."
+            : "https://www.indiabix.com | https://www.geeksforgeeks.org/aptitude/"
+        },
+        "MMaLzV-Wvmsya4aWx"           // ❗ replace with your PUBLIC KEY
+      );
+
 
       toast({
-        title: "Results Sent!",
-        description: `Your detailed test analysis has been sent to ${email}`,
+        title: "Email Sent Successfully",
+        description: `Results sent to ${email}`,
       });
     } catch (error) {
-      console.error("Error sending email:", error);
+      console.error("EmailJS Error:", error);
+
       toast({
         title: "Email Failed",
-        description: "There was an issue sending your results. Please contact support.",
+        description: "Email service error. Check EmailJS configuration.",
         variant: "destructive",
       });
-    } finally {
-      setIsSendingEmail(false);
     }
-  };
+
+
+   } catch (backendError) {
+     console.error("Backend failed:", backendError);
+     toast({
+       title: "Submission Failed",
+       description: "Could not evaluate test. Please try again.",
+       variant: "destructive",
+     });
+   } finally {
+     setIsSendingEmail(false);
+   }
+ };
 
   const answeredCount = answers.filter(a => a !== null).length;
   const progress = (answeredCount / aptitudeQuestions.length) * 100;
@@ -289,6 +339,12 @@ const AptitudeTest = () => {
       </div>
     );
   }
+{isSubmitted && resultMessage && (
+  <div className="mt-6 text-center text-lg font-semibold">
+    {resultMessage}
+  </div>
+)}
+
 
   return (
     <div className="min-h-screen bg-background">
@@ -311,7 +367,7 @@ const AptitudeTest = () => {
                 <div className="font-semibold">{companyName}</div>
               </div>
             </div>
-            
+
             <div className="flex items-center gap-4">
               <div className={`flex items-center gap-2 px-4 py-2 rounded-full ${
                 timeLeft < 300 ? 'bg-destructive/10 text-destructive' : 'bg-muted'
