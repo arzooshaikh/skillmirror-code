@@ -31,3 +31,6 @@ build/
 
 ### VS Code ###
 .vscode/
+
+# Contains database password - NEVER push
+src/main/resources/application.properties

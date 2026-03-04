@@ -1,10 +1,12 @@
 package com.skillmirror.backend.controller;
+
 import com.skillmirror.backend.entity.User;
 import com.skillmirror.backend.entity.LoginRequest;
 import com.skillmirror.backend.entity.RegisterRequest;
 import com.skillmirror.backend.repository.UserRepository;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -13,9 +15,12 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public AuthController(UserRepository userRepository) {
+    public AuthController(UserRepository userRepository,
+                          PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     // REGISTER
@@ -30,7 +35,9 @@ public class AuthController {
         user.setFullName(request.getFullName());
         user.setEmail(request.getEmail());
         user.setCollege(request.getCollege());
-        user.setPassword(request.getPassword()); //PLAIN PASSWORD (NO BCRYPT)
+
+        // ✅ ENCRYPT PASSWORD BEFORE SAVING
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
 
         userRepository.save(user);
 
@@ -41,9 +48,15 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
 
-        User user = userRepository.findByEmail(request.getEmail()).orElse(null);
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElse(null);
 
-        if (user == null || !user.getPassword().equals(request.getPassword())) {
+        if (user == null) {
+            return ResponseEntity.status(401).body("Invalid email or password");
+        }
+
+        // COMPARE ENCRYPTED PASSWORD
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             return ResponseEntity.status(401).body("Invalid email or password");
         }
 
