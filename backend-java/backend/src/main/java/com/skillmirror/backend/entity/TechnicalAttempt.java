@@ -17,7 +17,6 @@ public class TechnicalAttempt {
     private int totalQuestions;
     private double percentage;
     private String status;
-
     private LocalDateTime attemptedAt;
     private boolean passed;
 
@@ -45,4 +44,8 @@ public class TechnicalAttempt {
 
     public LocalDateTime getAttemptedAt() { return attemptedAt; }
     public void setAttemptedAt(LocalDateTime attemptedAt) { this.attemptedAt = attemptedAt; }
+
+    // ✅ ADDED MISSING GETTER & SETTER
+    public boolean isPassed() { return passed; }
+    public void setPassed(boolean passed) { this.passed = passed; }
 }
